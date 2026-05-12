@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-05-12
+
+### Added
+
+- **ExitPlanMode alert** — plan-mode "Accept this plan" prompt now triggers the same TTS + edge-pulse + auto-duck stack via PreToolUse hook. Spoken phrase: *"Plan ready"*.
+- **Plan keyword in TTS phrase mapping** — `"plan"` in the message routes to *"Plan ready"* instead of incorrectly falling through to *"Permission needed"* (accepting a plan ≠ approving a destructive action).
+
+### Fixed
+
+- **`${CLAUDE_PLUGIN_ROOT}` now quoted in hooks.json** — paths with whitespace (e.g. Windows usernames like `John Doe`) would have broken shell parsing. Matches the format shown in Claude Code's plugin docs example.
+
+### Marketplace metadata
+
+- Plugin entry now declares `category`, `tags`, `author`, `homepage`, `license`, and a pinned `version` for better discoverability in plugin browsers.
+
 ## [0.1.0] - 2026-05-12
 
 ### Initial release
@@ -34,5 +49,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 | `CLAUDE_STOP_TTS_TEXT="..."` | Override the Stop spoken phrase |
 | `CLAUDE_NOTIFY_DUCK_DISABLED=1` | Skip pausing Spotify/YouTube/etc around TTS |
 
-[Unreleased]: https://github.com/PettHa/tts-attention-alert/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/PettHa/tts-attention-alert/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/PettHa/tts-attention-alert/releases/tag/v0.1.1
 [0.1.0]: https://github.com/PettHa/tts-attention-alert/releases/tag/v0.1.0

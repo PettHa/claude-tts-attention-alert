@@ -71,6 +71,11 @@ const { buildDuckWrappedAction } = require('./lib/audio-duck');
 function pickPhrase(message) {
   const m = String(message || '').toLowerCase();
   if (!m) return 'Claude needs input';
+  // "plan ready" is matched first because the synthesized ExitPlanMode
+  // message contains "accept", which would otherwise fall into the
+  // permission bucket (wrong semantics — accepting a plan ≠ approving
+  // a destructive action).
+  if (/\bplan\b/.test(m)) return 'Plan ready';
   if (/permission|approve|approval|allow/.test(m)) return 'Permission needed';
   if (/\bidle\b|inactive/.test(m)) return 'Claude is idle';
   if (/waiting/.test(m)) return 'Claude is waiting';
@@ -171,6 +176,13 @@ function run(rawInput) {
       message = q && q.question
         ? `Claude has a question: ${q.question}`
         : 'Claude has a question';
+    }
+    // Plan mode acceptance — agent presents a plan and the user must
+    // click "Accept this plan" before work begins. Same pattern: the
+    // UI doesn't fire a native Notification event, so we piggyback on
+    // PreToolUse:ExitPlanMode.
+    if (data && data.tool_name === 'ExitPlanMode') {
+      message = 'Plan ready, accept to proceed';
     }
   } catch { /* still notify even if payload is unparseable */ }
 
