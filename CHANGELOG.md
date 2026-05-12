@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-12
+
+### Added
+
+- **Bash permission alert** — TTS + edge-pulse now fires when Claude Code is about to show the "Allow this bash command?" modal. Wired to Claude Code's native [`PermissionRequest`](https://code.claude.com/docs/en/hooks) hook event with matcher `Bash`, so the alert fires exactly when the dialog would be shown — no prediction, no allow-list simulation, no false positives.
+- **Spoken phrase includes command verb** — e.g. *"Bash permission needed: rm"* — recognizable by ear without reading the full command aloud.
+- **`CLAUDE_BASH_ALERT_DISABLED=1`** env var to silence just this hook (the existing `CLAUDE_NOTIFY_DISABLED=1` still disables the whole notification stack).
+
+### Why a dedicated hook event
+
+Claude Code's `Notification` event does not fire for the in-window "Allow this bash command?" modal, and predicting which commands will trigger it from `permissions.allow`/`deny` is unreliable in `acceptEdits` / `bypassPermissions` modes (Claude's safety classifier intervenes on its own heuristics). The `PermissionRequest` event was added precisely for this case — it fires when the dialog is about to display, with the full `tool_name` + `tool_input` + `permission_mode` + `permission_suggestions` payload. We use it as a pure signal: fire alert, no decision logic.
+
 ## [0.1.1] - 2026-05-12
 
 ### Added
@@ -49,6 +61,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 | `CLAUDE_STOP_TTS_TEXT="..."` | Override the Stop spoken phrase |
 | `CLAUDE_NOTIFY_DUCK_DISABLED=1` | Skip pausing Spotify/YouTube/etc around TTS |
 
-[Unreleased]: https://github.com/PettHa/tts-attention-alert/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/PettHa/tts-attention-alert/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/PettHa/tts-attention-alert/releases/tag/v0.2.0
 [0.1.1]: https://github.com/PettHa/tts-attention-alert/releases/tag/v0.1.1
 [0.1.0]: https://github.com/PettHa/tts-attention-alert/releases/tag/v0.1.0
