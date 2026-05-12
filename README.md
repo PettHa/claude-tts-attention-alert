@@ -8,14 +8,6 @@
 
 A Claude Code plugin that demands your attention when Claude pauses, asks a question, or finishes a response — even when you're in another window or away from the desk.
 
-<!-- DEMO_GIF_PLACEHOLDER -->
-<!--
-After recording a demo, replace this comment block with:
-![demo](docs/demo.gif)
-or for a higher-quality MP4:
-<video src="docs/demo.mp4" controls width="720"></video>
--->
-
 **Windows only.** The plugin uses Windows-native APIs (System.Speech.Synthesis, WPF, GlobalSystemMediaTransportControlsSessionManager). On macOS / Linux all hooks short-circuit on `process.platform !== 'win32'`.
 
 ## What it does
