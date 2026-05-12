@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `claude-tts-attention-alert` will be documented here.
+All notable changes to `tts-attention-alert` will be documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -34,5 +34,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 | `CLAUDE_STOP_TTS_TEXT="..."` | Override the Stop spoken phrase |
 | `CLAUDE_NOTIFY_DUCK_DISABLED=1` | Skip pausing Spotify/YouTube/etc around TTS |
 
-[Unreleased]: https://github.com/PettHa/claude-tts-attention-alert/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/PettHa/claude-tts-attention-alert/releases/tag/v0.1.0
+[Unreleased]: https://github.com/PettHa/tts-attention-alert/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/PettHa/tts-attention-alert/releases/tag/v0.1.0

@@ -1,10 +1,10 @@
-# claude-tts-attention-alert
+# tts-attention-alert
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Platform: Windows](https://img.shields.io/badge/platform-Windows%2010%2F11-0078d4)](https://github.com/PettHa/claude-tts-attention-alert)
+[![Platform: Windows](https://img.shields.io/badge/platform-Windows%2010%2F11-0078d4)](https://github.com/PettHa/tts-attention-alert)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-plugin-da7756)](https://code.claude.com/docs/en/plugins)
-[![Version](https://img.shields.io/github/v/release/PettHa/claude-tts-attention-alert?include_prereleases&label=version)](https://github.com/PettHa/claude-tts-attention-alert/releases)
-[![GitHub stars](https://img.shields.io/github/stars/PettHa/claude-tts-attention-alert?style=social)](https://github.com/PettHa/claude-tts-attention-alert/stargazers)
+[![Version](https://img.shields.io/github/v/release/PettHa/tts-attention-alert?include_prereleases&label=version)](https://github.com/PettHa/tts-attention-alert/releases)
+[![GitHub stars](https://img.shields.io/github/stars/PettHa/tts-attention-alert?style=social)](https://github.com/PettHa/tts-attention-alert/stargazers)
 
 A Claude Code plugin that demands your attention when Claude pauses, asks a question, or finishes a response — even when you're in another window or away from the desk.
 
@@ -46,8 +46,8 @@ Windows' built-in toast system plays a default notification chime that can't be 
 Requires Claude Code with plugin support (`/plugin` command available).
 
 ```text
-/plugin marketplace add PettHa/claude-tts-attention-alert
-/plugin install claude-tts-attention-alert@claude-tts-attention-alert
+/plugin marketplace add PettHa/tts-attention-alert
+/plugin install tts-attention-alert@tts-attention-alert
 ```
 
 Then reload the window (`Developer: Reload Window` or restart Claude Code) so settings re-register the hooks.
@@ -55,7 +55,7 @@ Then reload the window (`Developer: Reload Window` or restart Claude Code) so se
 To test locally before installing from GitHub:
 
 ```bash
-claude --plugin-dir /path/to/claude-tts-attention-alert
+claude --plugin-dir /path/to/tts-attention-alert
 ```
 
 ## Configuration (environment variables)
@@ -75,7 +75,7 @@ All optional. Set in your shell or `.env`:
 ## Architecture
 
 ```
-claude-tts-attention-alert/
+tts-attention-alert/
 ├── .claude-plugin/
 │   └── plugin.json            ← manifest
 ├── hooks/
