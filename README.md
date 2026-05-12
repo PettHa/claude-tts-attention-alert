@@ -15,7 +15,8 @@ A Claude Code plugin that demands your attention when Claude pauses, asks a ques
 When Claude:
 
 - **Pauses for permission** (e.g. you're about to run `git push`)
-- **Asks a question** via `AskUserQuestion`
+- **Wants to run a Bash command not in your allowlist** — the "Allow this bash command?" modal
+- **Asks a question** via `AskUserQuestion` or **presents a plan** via `ExitPlanMode`
 - **Finishes a response**
 
 …the plugin fires three reinforcing channels at once:
@@ -71,21 +72,40 @@ All optional. Set in your shell or `.env`:
 | `CLAUDE_STOP_TTS_DISABLED=1` | Disable just TTS for Stop |
 | `CLAUDE_STOP_TTS_TEXT="..."` | Override the Stop spoken phrase (default: *"Claude is done"*) |
 | `CLAUDE_NOTIFY_DUCK_DISABLED=1` | Skip pausing Spotify/YouTube/etc around TTS |
+| `CLAUDE_BASH_ALERT_DISABLED=1` | Disable just the Bash permission alert (other hooks still fire) |
+
+## Bash permission alert (v0.2.0+)
+
+Claude Code's `Notification` event does **not** fire for the in-window "Allow this bash command?" modal. To catch it, the plugin wires Claude Code's native [`PermissionRequest`](https://code.claude.com/docs/en/hooks) hook event with matcher `Bash` — the event fires exactly when the dialog is about to display, with the full payload:
+
+```jsonc
+{
+  "hook_event_name": "PermissionRequest",
+  "tool_name": "Bash",
+  "tool_input": { "command": "rm -rf node_modules", "description": "..." },
+  "permission_mode": "default",      // or "acceptEdits" / "bypassPermissions"
+  "permission_suggestions": [ ... ]
+}
+```
+
+No prediction, no allow-list simulation, no dangerous-pattern heuristics — just fire the alert. Spoken phrase is *"Bash permission needed: \<verb\>"* so urgent prompts are recognizable by ear without reading the full command aloud.
 
 ## Architecture
 
 ```
 tts-attention-alert/
 ├── .claude-plugin/
-│   └── plugin.json            ← manifest
+│   ├── plugin.json                  ← manifest
+│   └── marketplace.json             ← marketplace registration
 ├── hooks/
-│   ├── hooks.json             ← Notification + Stop + PreToolUse:AskUserQuestion wiring
-│   ├── notification-alert.js  ← fires on blocking events
-│   ├── stop-notify.js         ← fires when response ends
-│   ├── edge-pulse.ps1         ← 4-edge WPF overlay (looping + escalation)
-│   ├── run-hidden.vbs         ← `wscript` shim so PowerShell launches without a console flash
+│   ├── hooks.json                   ← Notification + Stop + PreToolUse + PermissionRequest wiring
+│   ├── notification-alert.js        ← Notification + AskUserQuestion + ExitPlanMode
+│   ├── bash-permission-alert.js     ← PermissionRequest:Bash, fires on the actual modal
+│   ├── stop-notify.js               ← fires when response ends
+│   ├── edge-pulse.ps1               ← 4-edge WPF overlay (looping + escalation)
+│   ├── run-hidden.vbs               ← `wscript` shim so PowerShell launches without a console flash
 │   └── lib/
-│       └── audio-duck.js      ← builds the WinRT pause-resume PowerShell snippet
+│       └── audio-duck.js            ← builds the WinRT pause-resume PowerShell snippet
 └── README.md
 ```
 
