@@ -40,7 +40,7 @@ Windows' built-in toast system plays a default notification chime that can't be 
 Requires Claude Code with plugin support (`/plugin` command available).
 
 ```text
-/plugin marketplace add pettha/claude-tts-attention-alert
+/plugin marketplace add PettHa/claude-tts-attention-alert
 /plugin install claude-tts-attention-alert@claude-tts-attention-alert
 ```
 
