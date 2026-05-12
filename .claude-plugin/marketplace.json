@@ -7,7 +7,10 @@
   "plugins": [
     {
       "name": "claude-tts-attention-alert",
-      "source": ".",
+      "source": {
+        "source": "github",
+        "repo": "PettHa/claude-tts-attention-alert"
+      },
       "description": "TTS + animated edge-pulse alerts that demand your attention when Claude pauses, asks a question, or finishes a response. Auto-ducks media around speech. Windows only."
     }
   ]
