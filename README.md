@@ -1,6 +1,20 @@
 # claude-tts-attention-alert
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Platform: Windows](https://img.shields.io/badge/platform-Windows%2010%2F11-0078d4)](https://github.com/PettHa/claude-tts-attention-alert)
+[![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-plugin-da7756)](https://code.claude.com/docs/en/plugins)
+[![Version](https://img.shields.io/github/v/release/PettHa/claude-tts-attention-alert?include_prereleases&label=version)](https://github.com/PettHa/claude-tts-attention-alert/releases)
+[![GitHub stars](https://img.shields.io/github/stars/PettHa/claude-tts-attention-alert?style=social)](https://github.com/PettHa/claude-tts-attention-alert/stargazers)
+
 A Claude Code plugin that demands your attention when Claude pauses, asks a question, or finishes a response — even when you're in another window or away from the desk.
+
+<!-- DEMO_GIF_PLACEHOLDER -->
+<!--
+After recording a demo, replace this comment block with:
+![demo](docs/demo.gif)
+or for a higher-quality MP4:
+<video src="docs/demo.mp4" controls width="720"></video>
+-->
 
 **Windows only.** The plugin uses Windows-native APIs (System.Speech.Synthesis, WPF, GlobalSystemMediaTransportControlsSessionManager). On macOS / Linux all hooks short-circuit on `process.platform !== 'win32'`.
 
