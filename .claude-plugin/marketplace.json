@@ -11,7 +11,15 @@
         "source": "url",
         "url": "https://github.com/PettHa/claude-tts-attention-alert.git"
       },
-      "description": "TTS + animated edge-pulse alerts that demand your attention when Claude pauses, asks a question, or finishes a response. Auto-ducks media around speech. Windows only."
+      "description": "TTS + animated edge-pulse alerts that demand your attention when Claude pauses, asks a question, or finishes a response. Auto-ducks media around speech. Windows only.",
+      "version": "0.1.0",
+      "author": {
+        "name": "PettHa"
+      },
+      "homepage": "https://github.com/PettHa/claude-tts-attention-alert",
+      "license": "MIT",
+      "category": "productivity",
+      "tags": ["tts", "notifications", "windows", "attention", "alerts", "afk"]
     }
   ]
 }

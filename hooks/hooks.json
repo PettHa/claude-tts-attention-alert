@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/notification-alert.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/notification-alert.js\"",
             "timeout": 5
           }
         ]
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/notification-alert.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/notification-alert.js\"",
             "timeout": 5
           }
         ]
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/stop-notify.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/stop-notify.js\"",
             "timeout": 5
           }
         ]
