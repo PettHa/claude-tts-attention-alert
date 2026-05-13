@@ -115,8 +115,14 @@ function run(rawInput) {
   if (isDisabled()) return { exitCode: 0 };
   if (process.platform !== 'win32') return { exitCode: 0 };
 
-  // Parse but don't require — Stop event payload is informational.
-  try { JSON.parse(rawInput); } catch { /* ignore */ }
+  // Bail on subagent stops — only the main agent's Stop should alert.
+  // Some Claude Code versions fire SubagentStop through Stop-hook
+  // handlers when no explicit SubagentStop matcher is registered, so
+  // we filter defensively on hook_event_name from the payload.
+  try {
+    const data = JSON.parse(rawInput);
+    if (data && data.hook_event_name === 'SubagentStop') return { exitCode: 0 };
+  } catch { /* unparseable payload -> treat as main Stop */ }
 
   // Log every Stop regardless of throttle — log is forensic record.
   logEvent();
