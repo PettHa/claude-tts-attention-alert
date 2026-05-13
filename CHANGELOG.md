@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-13
+
+### Fixed
+
+- **Stop hook no longer fires on subagent completion** — `stop-notify.js` now reads `hook_event_name` from the payload and bails when it equals `"SubagentStop"`. Some Claude Code versions route subagent stops through the `Stop` hook handler when no explicit `SubagentStop` matcher is registered, so this is a defensive in-script filter rather than a `hooks.json` change. Result: TTS + edge-pulse fire only when the main agent stops, not every time Claude finishes a delegated Agent/Explore/Plan subagent run.
+
 ## [0.2.0] - 2026-05-12
 
 ### Added
@@ -61,7 +67,8 @@ Claude Code's `Notification` event does not fire for the in-window "Allow this b
 | `CLAUDE_STOP_TTS_TEXT="..."` | Override the Stop spoken phrase |
 | `CLAUDE_NOTIFY_DUCK_DISABLED=1` | Skip pausing Spotify/YouTube/etc around TTS |
 
-[Unreleased]: https://github.com/PettHa/tts-attention-alert/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/PettHa/tts-attention-alert/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/PettHa/tts-attention-alert/releases/tag/v0.2.1
 [0.2.0]: https://github.com/PettHa/tts-attention-alert/releases/tag/v0.2.0
 [0.1.1]: https://github.com/PettHa/tts-attention-alert/releases/tag/v0.1.1
 [0.1.0]: https://github.com/PettHa/tts-attention-alert/releases/tag/v0.1.0
