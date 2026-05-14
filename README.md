@@ -21,7 +21,7 @@ When Claude:
 
 …the plugin fires three reinforcing channels at once:
 
-1. **🗣️ TTS speech** — Windows `System.Speech` reads the actual notification message, mapped to a short action phrase via keywords:
+1. **🗣️ TTS speech** — plays a pre-baked [Supertonic](https://github.com/supertone-inc/supertonic) WAV for known phrases (no model download for end-users), falls back to Windows `System.Speech` for env-var overrides and unbaked text. Messages are mapped to a short action phrase via keywords:
    - "permission" / "approve" / "allow" → *"Permission needed"*
    - "waiting" → *"Claude is waiting"*
    - "idle" → *"Claude is idle"*
@@ -59,6 +59,29 @@ To test locally before installing from GitHub:
 claude --plugin-dir /path/to/tts-attention-alert
 ```
 
+## Choose your TTS engine
+
+The plugin ships with two voices side-by-side:
+
+| Engine | Quality | How it sounds | When it's used |
+| :--- | :--- | :--- | :--- |
+| **Supertonic** (default) | High — neural, on-device | Natural human cadence, F1 (female) voice | All built-in phrases (`Permission needed`, `Claude is done`, `Bash permission needed: git`, …) |
+| **Windows SAPI** (fallback) | Standard — robotic system voice | Whatever your `System.Speech.Synthesis` default is set to | `CLAUDE_NOTIFY_TTS_TEXT` / `CLAUDE_STOP_TTS_TEXT` overrides, and any phrase not in the pre-baked set |
+
+**To force SAPI everywhere** (e.g. you don't like the F1 voice or want a system-consistent feel):
+
+```bash
+export CLAUDE_NOTIFY_WAV_DISABLED=1
+```
+
+**To switch the Supertonic voice** (e.g. M1 male instead of F1):
+
+```bash
+.venv-supertonic/Scripts/python.exe scripts/generate-audio.py --voice M1
+```
+
+This overwrites `audio/*.wav` with the new voice. Voices: `M1`–`M5` (male), `F1`–`F5` (female). See [Audio assets](#audio-assets) for setup details.
+
 ## Configuration (environment variables)
 
 All optional. Set in your shell or `.env`:
@@ -73,6 +96,7 @@ All optional. Set in your shell or `.env`:
 | `CLAUDE_STOP_TTS_TEXT="..."` | Override the Stop spoken phrase (default: *"Claude is done"*) |
 | `CLAUDE_NOTIFY_DUCK_DISABLED=1` | Skip pausing Spotify/YouTube/etc around TTS |
 | `CLAUDE_BASH_ALERT_DISABLED=1` | Disable just the Bash permission alert (other hooks still fire) |
+| `CLAUDE_NOTIFY_WAV_DISABLED=1` | Skip the pre-baked Supertonic WAVs and always use Windows SAPI |
 
 ## Bash permission alert (v0.2.0+)
 
@@ -97,6 +121,9 @@ tts-attention-alert/
 ├── .claude-plugin/
 │   ├── plugin.json                  ← manifest
 │   └── marketplace.json             ← marketplace registration
+├── audio/                           ← pre-baked Supertonic WAVs (committed, no runtime download)
+│   ├── permission-needed.wav        ← one per static phrase + one per common bash verb
+│   └── …
 ├── hooks/
 │   ├── hooks.json                   ← Notification + Stop + PreToolUse + PermissionRequest wiring
 │   ├── notification-alert.js        ← Notification + AskUserQuestion + ExitPlanMode
@@ -105,9 +132,28 @@ tts-attention-alert/
 │   ├── edge-pulse.ps1               ← 4-edge WPF overlay (looping + escalation)
 │   ├── run-hidden.vbs               ← `wscript` shim so PowerShell launches without a console flash
 │   └── lib/
-│       └── audio-duck.js            ← builds the WinRT pause-resume PowerShell snippet
+│       ├── audio-duck.js            ← builds the WinRT pause-resume PowerShell snippet
+│       └── play-wav.js              ← maps phrase → slug → pre-baked WAV path
+├── scripts/
+│   └── generate-audio.py            ← dev-only: regenerate audio/*.wav via Supertonic
 └── README.md
 ```
+
+### Audio assets
+
+`audio/*.wav` is pre-baked once on the dev machine using [Supertonic](https://github.com/supertone-inc/supertonic) and checked into the repo. End-users get high-quality on-device speech with **zero** runtime model download and no Python dependency.
+
+To regenerate (e.g. to switch voice or add phrases):
+
+```bash
+python -m venv .venv-supertonic
+.venv-supertonic/Scripts/python.exe -m pip install supertonic
+HF_HUB_DISABLE_XET=1 .venv-supertonic/Scripts/python.exe scripts/generate-audio.py --voice F1
+```
+
+The first run downloads the ~99 MB Supertonic ONNX model into your Hugging Face cache. `HF_HUB_DISABLE_XET=1` is needed because the Xet CDN endpoint can fail DNS resolution on some networks — vanilla HTTPS works fine. Available voices: `M1`–`M5` (male), `F1`–`F5` (female).
+
+Phrases the plugin pre-bakes are listed in `scripts/generate-audio.py`. If you add a new phrase to a hook script, also add it to `STATIC_PHRASES` (or `BASH_VERBS`) there and to `PHRASE_TO_SLUG` in `hooks/lib/play-wav.js`, then rerun the script. Unknown phrases fall through to live SAPI synthesis at runtime — nothing crashes.
 
 Hook scripts spawn PowerShell via a VBScript shim (`run-hidden.vbs` → `WScript.Shell.Run cmd, 0, False`) so nothing flashes a console on launch. The PowerShell script is passed base64-encoded via `-EncodedCommand` to avoid quoting headaches through `cmd` → `wscript` → `powershell`.
 

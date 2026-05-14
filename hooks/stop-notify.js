@@ -54,17 +54,19 @@ function shouldThrottle() {
 }
 
 const { buildDuckWrappedAction } = require('./lib/audio-duck');
+const { buildPlayWavAction } = require('./lib/play-wav');
 
 function buildPowerShellScript() {
   const ttsDisabled = String(process.env.CLAUDE_STOP_TTS_DISABLED || '').toLowerCase() === '1';
   if (ttsDisabled) return null;
   const ttsRaw = process.env.CLAUDE_STOP_TTS_TEXT || 'Claude is done';
   const ttsText = ttsRaw.replace(/'/g, "''").slice(0, 140);
-  // No balloon toast — that triggers Windows' built-in notification
-  // sound, which the user has banned. Visual cue is edge-pulse, audio
-  // is pure TTS. Pause Spotify/YouTube around the speak call.
-  const rawSpeak = `Add-Type -AssemblyName System.Speech | Out-Null; $tts = New-Object System.Speech.Synthesis.SpeechSynthesizer; $tts.Speak('${ttsText}'); $tts.Dispose()`;
-  return buildDuckWrappedAction(rawSpeak);
+  // Prefer pre-baked Supertonic WAV; fall back to live SAPI synthesis for
+  // the env-var override path and any unbaked phrase.
+  const wavAction = process.env.CLAUDE_STOP_TTS_TEXT ? null : buildPlayWavAction(ttsRaw);
+  const speakAction = wavAction
+    || `Add-Type -AssemblyName System.Speech | Out-Null; $tts = New-Object System.Speech.Synthesis.SpeechSynthesizer; $tts.Speak('${ttsText}'); $tts.Dispose()`;
+  return buildDuckWrappedAction(speakAction);
 }
 
 function logEvent() {

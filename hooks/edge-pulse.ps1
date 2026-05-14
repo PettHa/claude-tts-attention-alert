@@ -176,11 +176,20 @@ if ($DurationMs -gt 0) {
 Add-Type -AssemblyName System.Speech | Out-Null
 
 function Invoke-EscalationTTS([string]$text) {
+    # Prefer pre-baked Supertonic WAV for the canonical escalation phrase.
+    # Async via SoundPlayer.Play() (not PlaySync) so the pulse animation
+    # keeps running while audio plays.
+    $wavPath = Join-Path (Split-Path $PSScriptRoot -Parent) 'audio\claude-still-needs.wav'
+    if ((-not $env:CLAUDE_NOTIFY_WAV_DISABLED) -and (Test-Path $wavPath)) {
+        try {
+            $player = New-Object System.Media.SoundPlayer $wavPath
+            $player.Play()
+            return
+        } catch { }
+    }
+    # SAPI fallback — live synthesis for unbaked or disabled-WAV cases.
     try {
         $tts = New-Object System.Speech.Synthesis.SpeechSynthesizer
-        # Async — we don't want to freeze the pulse animation while
-        # speaking. SpeakAsync returns immediately; the synthesizer
-        # is disposed when the speak completes via its event.
         $prompt = $tts.SpeakAsync($text)
         $tts.add_SpeakCompleted({ param($s, $e) $s.Dispose() })
     } catch { }
