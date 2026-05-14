@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-14
+
+### Added
+
+- **Pre-baked Supertonic WAVs replace Windows SAPI for built-in phrases.** `audio/*.wav` ships 21 neural-quality WAVs (F1 voice) generated via [Supertonic](https://github.com/supertone-inc/supertonic) ONNX TTS for every phrase the plugin emits: 7 static (`Permission needed`, `Plan ready`, `Claude is done`, …), 1 bare `Bash permission needed`, and 13 common bash-verb variants (`git`, `rm`, `npm`, `docker`, …). Played via `System.Media.SoundPlayer.PlaySync()` inside the existing Spotify/YouTube auto-duck wrapper. Zero runtime model download for end-users.
+- `hooks/lib/play-wav.js` — phrase → slug → WAV path mapping, plus 7-test suite in `play-wav.test.js`.
+- `scripts/generate-audio.py` — dev-only regeneration script. Voice selectable via `--voice <M1-M5/F1-F5>`. Requires `pip install supertonic` and `HF_HUB_DISABLE_XET=1` env var (HF Xet CDN has DNS-resolution issues on some networks).
+- `CLAUDE_NOTIFY_WAV_DISABLED=1` env var — force Windows SAPI everywhere if the user prefers the system voice.
+- README sections: "Choose your TTS engine" and "Audio assets".
+
+### Changed
+
+- `notification-alert.js`, `stop-notify.js`, `bash-permission-alert.js`, `edge-pulse.ps1` (`Invoke-EscalationTTS`) all now prefer pre-baked WAV with SAPI fallback. SAPI still handles `CLAUDE_NOTIFY_TTS_TEXT` / `CLAUDE_STOP_TTS_TEXT` overrides and any phrase not in the baked set.
+
 ## [0.2.1] - 2026-05-13
 
 ### Fixed
