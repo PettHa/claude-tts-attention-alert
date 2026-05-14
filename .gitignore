@@ -4,3 +4,7 @@ node_modules/
 *.swp
 *.bak
 *.tmp
+
+# Supertonic dev-only — venv + sample comparison WAVs are not shipped
+.venv-supertonic/
+audio/samples/

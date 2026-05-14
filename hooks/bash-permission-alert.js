@@ -42,6 +42,7 @@ const STATE_FILE = path.join(STATE_DIR, 'bash-permission-alert-last.json');
 const LOG_FILE = path.join(STATE_DIR, 'notifications.log');
 
 const { buildDuckWrappedAction } = require('./lib/audio-duck');
+const { buildPlayWavAction } = require('./lib/play-wav');
 
 function isDisabled() {
   if (String(process.env.CLAUDE_NOTIFY_DISABLED || '').toLowerCase() === '1') return true;
@@ -77,8 +78,15 @@ function buildPowerShellScript(command) {
   if (String(process.env.CLAUDE_NOTIFY_TTS_DISABLED || '').toLowerCase() === '1') return null;
   const ttsRaw = process.env.CLAUDE_NOTIFY_TTS_TEXT || pickPhrase(command);
   const ttsText = escapeSingleQuotes(ttsRaw.slice(0, 140));
-  const rawSpeak = `Add-Type -AssemblyName System.Speech | Out-Null; $tts = New-Object System.Speech.Synthesis.SpeechSynthesizer; $tts.Speak('${ttsText}'); $tts.Dispose()`;
-  return buildDuckWrappedAction(rawSpeak);
+  // Prefer pre-baked Supertonic WAV for known verbs; fall back to bare
+  // "Bash permission needed" WAV for unknown verbs (via slug fallback in
+  // play-wav.js), or live SAPI for the env-var override.
+  const wavAction = process.env.CLAUDE_NOTIFY_TTS_TEXT
+    ? null
+    : buildPlayWavAction(ttsRaw) || buildPlayWavAction('Bash permission needed');
+  const speakAction = wavAction
+    || `Add-Type -AssemblyName System.Speech | Out-Null; $tts = New-Object System.Speech.Synthesis.SpeechSynthesizer; $tts.Speak('${ttsText}'); $tts.Dispose()`;
+  return buildDuckWrappedAction(speakAction);
 }
 
 function logEvent(command) {

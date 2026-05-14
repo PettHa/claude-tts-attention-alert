@@ -64,6 +64,7 @@ function escapeSingleQuotes(s) {
 }
 
 const { buildDuckWrappedAction } = require('./lib/audio-duck');
+const { buildPlayWavAction } = require('./lib/play-wav');
 
 // Map a notification message to a short distinct TTS phrase. Order
 // matters: most-actionable keywords first. Falls back to the message
@@ -92,11 +93,12 @@ function buildPowerShellScript(message) {
   // everything.
   const ttsRaw = process.env.CLAUDE_NOTIFY_TTS_TEXT || pickPhrase(message);
   const ttsText = escapeSingleQuotes(ttsRaw.slice(0, 140));
-  // No balloon toast — that would trigger Windows' built-in notification
-  // sound, which the user wants to avoid. Visual cue is edge-pulse,
-  // audio cue is pure TTS. Pause Spotify/YouTube around the speak call.
-  const rawSpeak = `Add-Type -AssemblyName System.Speech | Out-Null; $tts = New-Object System.Speech.Synthesis.SpeechSynthesizer; $tts.Speak('${ttsText}'); $tts.Dispose()`;
-  return buildDuckWrappedAction(rawSpeak);
+  // Prefer pre-baked Supertonic WAV; fall back to live SAPI synthesis
+  // for the env-var override path and any phrase we did not bake.
+  const wavAction = process.env.CLAUDE_NOTIFY_TTS_TEXT ? null : buildPlayWavAction(ttsRaw);
+  const speakAction = wavAction
+    || `Add-Type -AssemblyName System.Speech | Out-Null; $tts = New-Object System.Speech.Synthesis.SpeechSynthesizer; $tts.Speak('${ttsText}'); $tts.Dispose()`;
+  return buildDuckWrappedAction(speakAction);
 }
 
 function logEvent(message) {
